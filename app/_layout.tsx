@@ -16,6 +16,7 @@ import { PortalHost } from "@rn-primitives/portal";
 import { ThemeToggle } from "~/components/ThemeToggle";
 import { setAndroidNavigationBar } from "~/lib/android-navigation-bar";
 import { useLayoutEffect, useRef, useState } from "react";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
 
 const LIGHT_THEME: Theme = {
   ...DefaultTheme,
@@ -30,6 +31,11 @@ export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,
 } from "expo-router";
+
+GoogleSignin.configure({
+  webClientId:
+    "894661082702-svtpejtro8khh3rjshgm357i1oul2u5n.apps.googleusercontent.com",
+});
 
 export default function RootLayout() {
   const hasMounted = useRef(false);
@@ -57,7 +63,7 @@ export default function RootLayout() {
         <Stack.Screen
           name="index"
           options={{
-            title: "Mobile Starter Screen",
+            title: "Starter Screen - Signed in",
             headerRight: () => <ThemeToggle />,
           }}
         />
