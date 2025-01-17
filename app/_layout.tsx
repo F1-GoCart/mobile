@@ -1,5 +1,6 @@
 import "~/global.css";
 
+import "expo-dev-client";
 import {
   DarkTheme,
   DefaultTheme,
