@@ -1,5 +1,5 @@
 import { Session } from "@supabase/supabase-js";
-import { Redirect, Slot } from "expo-router";
+import { Href, Redirect, Slot } from "expo-router";
 import { useEffect, useState } from "react";
 import { supabase } from "~/lib/supabase";
 import { ActivityIndicator } from "react-native";
@@ -22,7 +22,7 @@ export default function AppLayout() {
   }
 
   if (session && session.user) {
-    return <Redirect href="/home" />;
+    return <Redirect href={"/" as Href} />;
   }
 
   return <Slot />;

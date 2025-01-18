@@ -1,5 +1,5 @@
 import { Session } from "@supabase/supabase-js";
-import { Redirect, Slot, Stack } from "expo-router";
+import { Redirect, Stack } from "expo-router";
 import { useEffect, useState } from "react";
 import { supabase } from "~/lib/supabase";
 import { ActivityIndicator } from "react-native";
@@ -25,5 +25,14 @@ export default function AppLayout() {
     return <Redirect href="/login" />;
   }
 
-  return <Slot />;
+  return (
+    <Stack>
+      <Stack.Screen
+        name="index"
+        options={{
+          title: "Home Screen",
+        }}
+      />
+    </Stack>
+  );
 }
