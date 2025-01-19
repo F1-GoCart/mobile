@@ -13,9 +13,12 @@ import * as React from "react";
 import { NAV_THEME } from "~/lib/constants";
 import { useColorScheme } from "~/lib/useColorScheme";
 import { PortalHost } from "@rn-primitives/portal";
-import { ThemeToggle } from "~/components/ThemeToggle";
 import { setAndroidNavigationBar } from "~/lib/android-navigation-bar";
 import { useLayoutEffect, useRef, useState } from "react";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
+import { Appearance } from "react-native";
+import { Toaster } from "sonner-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 const LIGHT_THEME: Theme = {
   ...DefaultTheme,
@@ -30,6 +33,13 @@ export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,
 } from "expo-router";
+
+GoogleSignin.configure({
+  webClientId:
+    "894661082702-svtpejtro8khh3rjshgm357i1oul2u5n.apps.googleusercontent.com",
+});
+
+Appearance.setColorScheme("light"); // Default to light theme
 
 export default function RootLayout() {
   const hasMounted = useRef(false);
@@ -52,17 +62,17 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
-      <StatusBar style={isDarkColorScheme ? "light" : "dark"} />
-      <Stack>
-        <Stack.Screen
-          name="index"
-          options={{
-            title: "Mobile Starter Screen",
-            headerRight: () => <ThemeToggle />,
+      <GestureHandlerRootView>
+        <StatusBar style={isDarkColorScheme ? "light" : "dark"} />
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            animation: "fade_from_bottom",
           }}
         />
-      </Stack>
-      <PortalHost />
+        <Toaster />
+        <PortalHost />
+      </GestureHandlerRootView>
     </ThemeProvider>
   );
 }
