@@ -22,27 +22,17 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "~/components/ui/tooltip";
-import { useEffect, useState } from "react";
-import { Session } from "@supabase/supabase-js";
+import { useState } from "react";
 import { supabase } from "~/lib/supabase";
+import useAuthStore from "~/stores/AuthStore";
 
 export default function Screen() {
-  const [session, setSession] = useState<Session | null>(null);
+  const { session } = useAuthStore();
   const [progress, setProgress] = useState(78);
 
   function updateProgressValue() {
     setProgress(Math.floor(Math.random() * 100));
   }
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
-
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-  }, []);
 
   if (!session) {
     return null;
