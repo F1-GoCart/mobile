@@ -14,11 +14,13 @@ import { NAV_THEME } from "~/lib/constants";
 import { useColorScheme } from "~/lib/useColorScheme";
 import { PortalHost } from "@rn-primitives/portal";
 import { setAndroidNavigationBar } from "~/lib/android-navigation-bar";
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { Appearance } from "react-native";
 import { Toaster } from "sonner-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { supabase } from "~/lib/supabase";
+import useAuthStore from "~/stores/AuthStore";
 
 const LIGHT_THEME: Theme = {
   ...DefaultTheme,
@@ -54,6 +56,17 @@ export default function RootLayout() {
     setAndroidNavigationBar(colorScheme);
     setIsColorSchemeLoaded(true);
     hasMounted.current = true;
+  }, []);
+
+  const { setSession } = useAuthStore();
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
   }, []);
 
   if (!isColorSchemeLoaded) {

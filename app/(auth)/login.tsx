@@ -1,16 +1,14 @@
-import {
-  GoogleSignin,
-  statusCodes,
-} from "@react-native-google-signin/google-signin";
-import { ToastAndroid, View } from "react-native";
+import { statusCodes } from "@react-native-google-signin/google-signin";
+import { View } from "react-native";
 import { Text } from "~/components/ui/text";
-import { supabase } from "~/lib/supabase";
 import { Button } from "~/components/ui/button";
 import Google from "~/assets/images/logos/google.svg";
 import Banner from "~/assets/images/banner.svg";
 import { toast } from "sonner-native";
+import useAuthStore from "~/stores/AuthStore";
 
 export default function LoginScreen() {
+  const { loginWithGoogle } = useAuthStore();
   return (
     <View className="flex-1 items-center justify-center gap-5 bg-[#0FA958] px-3">
       <View className="w-[80%] items-center">
@@ -22,17 +20,7 @@ export default function LoginScreen() {
           className="h-28 w-[90%] flex-row items-center justify-center gap-3 rounded-3xl"
           onPress={async () => {
             try {
-              await GoogleSignin.hasPlayServices();
-              const userInfo = await GoogleSignin.signIn();
-              if (userInfo.data?.idToken) {
-                const { data, error } = await supabase.auth.signInWithIdToken({
-                  provider: "google",
-                  token: userInfo.data.idToken,
-                });
-                console.log(error, data);
-              } else {
-                throw new Error("no ID token present!");
-              }
+              await loginWithGoogle();
             } catch (error: any) {
               if (error.code === statusCodes.SIGN_IN_CANCELLED) {
                 toast.error("Login cancelled", {

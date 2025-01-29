@@ -1,21 +1,9 @@
-import { Session } from "@supabase/supabase-js";
 import { Href, Redirect, Slot } from "expo-router";
-import { useEffect, useState } from "react";
-import { supabase } from "~/lib/supabase";
 import { ActivityIndicator } from "react-native";
+import useAuthStore from "~/stores/AuthStore";
 
 export default function AppLayout() {
-  const [session, setSession] = useState<Session | null | undefined>(undefined);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
-
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-  }, []);
+  const { session } = useAuthStore();
 
   if (session === undefined) {
     return <ActivityIndicator />;
