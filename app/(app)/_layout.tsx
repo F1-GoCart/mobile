@@ -15,12 +15,8 @@ export default function AppLayout() {
 
   return (
     <Stack>
-      <Stack.Screen
-        name="index"
-        options={{
-          title: "Home Screen",
-        }}
-      />
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen name="scan" />
     </Stack>
   );
 }
