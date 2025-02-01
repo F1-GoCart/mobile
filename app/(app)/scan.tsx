@@ -1,90 +1,146 @@
-import { ActivityIndicator, View } from "react-native";
-import { Info } from "~/lib/icons/Info";
-import { Avatar, AvatarImage } from "~/components/ui/avatar";
-import { Button } from "~/components/ui/button";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  Card,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "~/components/ui/card";
-import { Text } from "~/components/ui/text";
+  View,
+  Dimensions,
+  TouchableOpacity,
+  Text,
+  ActivityIndicator,
+} from "react-native";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "~/components/ui/tooltip";
+  BarcodeScanningResult,
+  CameraView,
+  useCameraPermissions,
+} from "expo-camera";
 import { supabase } from "~/lib/supabase";
-import useAuthStore from "~/stores/AuthStore";
-import { useQuery } from "@tanstack/react-query";
+import { useFocusEffect, useRouter } from "expo-router";
+import { toast } from "sonner-native";
+interface QrBounds {
+  width: number;
+  height: number;
+  originX: number;
+  originY: number;
+}
+export default function BarcodeScanner() {
+  const screenWidth = Dimensions.get("window").width;
+  const screenHeight = Dimensions.get("window").height;
+  const [scanned, setScanned] = useState<boolean>(false);
+  const [scannedData, setScannedData] = useState<string | null>(null);
+  const [barcodeBounds, setBarcodeBounds] = useState<QrBounds | null>(null);
+  const router = useRouter();
+  const onBarcodeScanned = (result: BarcodeScanningResult) => {
+    const { origin, size } = result.bounds;
+    setScanned(true);
+    setBarcodeBounds({
+      width: size.width,
+      height: size.height,
+      originX: origin.x,
+      originY: origin.y,
+    });
+    setScannedData(result.data);
+    console.log("Scanned Data:", scannedData);
+  };
+  const startSession = async () => {
+    const { error } = await supabase
+      .from("shopping_carts")
+      .update({ status: "in_use" })
+      .eq("cart_id", scannedData!);
+    if (error) {
+      console.error("Error updating status: ", error.message);
+    }
+  };
+  const [permission, requestPermission] = useCameraPermissions();
+  const permissionDenied = useRef(false);
 
-export default function Screen() {
-  const { session } = useAuthStore();
+  useEffect(() => {
+    console.log(permissionDenied.current);
+    if (permissionDenied.current) return;
 
-  if (!session) {
-    return null;
-  }
+    console.log(permission);
+    if (permission && !permission.granted) {
+      requestPermission().then((result) => {
+        if (!result.granted) {
+          permissionDenied.current = true;
+          toast.error("Camera permission is required to scan QR codes.");
+          router.back();
+        }
+      });
+    }
+  }, [permission]);
 
-  const {
-    data: user,
-    status,
-    error,
-  } = useQuery({
-    queryKey: ["user", session.user.id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("users")
-        .select()
-        .eq("id", session.user.id)
-        .single();
-
-      if (error) {
-        throw error;
-      }
-
-      return data;
-    },
-  });
-
-  if (status === "pending") {
+  if (!permission) {
     return <ActivityIndicator />;
   }
 
-  if (status === "error") {
-    return <Text>Error: {error.message}</Text>;
-  }
-
   return (
-    <View className="flex-1 items-center justify-center gap-5 bg-secondary/30 p-6">
-      <Card className="w-full max-w-sm rounded-2xl p-6">
-        <CardHeader className="items-center">
-          <Avatar alt="Your Avatar" className="h-24 w-24">
-            <AvatarImage source={{ uri: user.avatar_url! }} />
-          </Avatar>
-          <View className="p-3" />
-          <CardTitle className="pb-2 text-center">
-            This is the scan page
-          </CardTitle>
-          <View className="flex-row">
-            <CardDescription className="text-base font-semibold">
-              {user.email}
-            </CardDescription>
-            <Tooltip delayDuration={150}>
-              <TooltipTrigger className="px-2 pb-0.5 active:opacity-50">
-                <Info
-                  size={14}
-                  strokeWidth={2.5}
-                  className="h-4 w-4 text-foreground/70"
-                />
-              </TooltipTrigger>
-              <TooltipContent className="px-4 py-2 shadow">
-                <Text className="native:text-lg">Freelance</Text>
-              </TooltipContent>
-            </Tooltip>
+    <View style={{ flex: 1 }}>
+      <CameraView
+        style={{ flex: 1 }}
+        barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
+        onBarcodeScanned={onBarcodeScanned}
+      />
+      {!scanned ? (
+        <View>
+          <View
+            className="absolute z-10"
+            style={{
+              width: screenWidth * 0.5,
+              height: screenWidth * 0.5,
+              top: screenHeight * 0.25,
+              left: screenWidth * 0.25,
+            }}
+          >
+            {/* Top-Left Corner */}
+            <View className="absolute h-8 w-8 rounded-tl-lg border-l-[3px] border-t-[3px] border-white" />
+            {/* Top-Right Corner */}
+            <View className="absolute right-0 h-8 w-8 rounded-tr-lg border-r-[3px] border-t-[3px] border-white" />
+            {/* Bottom-Left Corner */}
+            <View className="absolute bottom-0 h-8 w-8 rounded-bl-lg border-b-[3px] border-l-[3px] border-white" />
+            {/* Bottom-Right Corner */}
+            <View className="absolute bottom-0 right-0 h-8 w-8 rounded-br-lg border-b-[3px] border-r-[3px] border-white" />
           </View>
-        </CardHeader>
-      </Card>
+        </View>
+      ) : (
+        barcodeBounds && (
+          <View
+            className="absolute z-10"
+            style={{
+              width: barcodeBounds.width,
+              height: barcodeBounds.height,
+              left: barcodeBounds.originX,
+              top: barcodeBounds.originY,
+            }}
+          >
+            {/* Top-Left Corner */}
+            <View className="absolute h-8 w-8 rounded-tl-lg border-l-[3px] border-t-[3px] border-white" />
+            {/* Top-Right Corner */}
+            <View className="absolute right-0 h-8 w-8 rounded-tr-lg border-r-[3px] border-t-[3px] border-white" />
+            {/* Bottom-Left Corner */}
+            <View className="absolute bottom-0 h-8 w-8 rounded-bl-lg border-b-[3px] border-l-[3px] border-white" />
+            {/* Bottom-Right Corner */}
+            <View className="absolute bottom-0 right-0 h-8 w-8 rounded-br-lg border-b-[3px] border-r-[3px] border-white" />
+          </View>
+        )
+      )}
+      {scannedData && (
+        <View
+          style={{
+            position: "absolute",
+            bottom: 20,
+            alignSelf: "center",
+            backgroundColor: "white",
+            padding: 10,
+            borderRadius: 5,
+          }}
+        >
+          <Text>Scanned Data: {scannedData}</Text>
+          <TouchableOpacity
+            className="rounded bg-blue-500 px-4 py-2"
+            onPress={startSession}
+          >
+            <Text className="font-bold text-white">Activate Cart!</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 }
