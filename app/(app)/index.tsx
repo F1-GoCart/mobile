@@ -1,41 +1,58 @@
-import { View } from "react-native";
-import Animated, {
-  FadeInUp,
-  FadeOutDown,
-  LayoutAnimationConfig,
-} from "react-native-reanimated";
+import { ActivityIndicator, View } from "react-native";
 import { Info } from "~/lib/icons/Info";
 import { Avatar, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import {
   Card,
-  CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import { Progress } from "~/components/ui/progress";
 import { Text } from "~/components/ui/text";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "~/components/ui/tooltip";
-import { useState } from "react";
 import { supabase } from "~/lib/supabase";
 import useAuthStore from "~/stores/AuthStore";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Screen() {
   const { session } = useAuthStore();
-  const [progress, setProgress] = useState(78);
-
-  function updateProgressValue() {
-    setProgress(Math.floor(Math.random() * 100));
-  }
 
   if (!session) {
     return null;
+  }
+
+  const {
+    data: user,
+    status,
+    error,
+  } = useQuery({
+    queryKey: ["user", session.user.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("users")
+        .select()
+        .eq("id", session.user.id)
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
+      return data;
+    },
+  });
+
+  if (status === "pending") {
+    return <ActivityIndicator />;
+  }
+
+  if (status === "error") {
+    return <Text>Error: {error.message}</Text>;
   }
 
   return (
@@ -43,17 +60,13 @@ export default function Screen() {
       <Card className="w-full max-w-sm rounded-2xl p-6">
         <CardHeader className="items-center">
           <Avatar alt="Your Avatar" className="h-24 w-24">
-            <AvatarImage
-              source={{ uri: session.user.user_metadata.avatar_url }}
-            />
+            <AvatarImage source={{ uri: user.avatar_url! }} />
           </Avatar>
           <View className="p-3" />
-          <CardTitle className="pb-2 text-center">
-            {session.user.user_metadata.name}
-          </CardTitle>
+          <CardTitle className="pb-2 text-center">{user.name}</CardTitle>
           <View className="flex-row">
             <CardDescription className="text-base font-semibold">
-              {session.user.email}
+              {user.email}
             </CardDescription>
             <Tooltip delayDuration={150}>
               <TooltipTrigger className="px-2 pb-0.5 active:opacity-50">
@@ -69,51 +82,7 @@ export default function Screen() {
             </Tooltip>
           </View>
         </CardHeader>
-        <CardContent>
-          <View className="flex-row justify-around gap-3">
-            <View className="items-center">
-              <Text className="text-sm text-muted-foreground">Dimension</Text>
-              <Text className="text-xl font-semibold">Earth-1</Text>
-            </View>
-            <View className="items-center">
-              <Text className="text-sm text-muted-foreground">Age</Text>
-              <Text className="text-xl font-semibold">20+</Text>
-            </View>
-            <View className="items-center">
-              <Text className="text-sm text-muted-foreground">Species</Text>
-              <Text className="text-xl font-semibold">Human</Text>
-            </View>
-          </View>
-        </CardContent>
         <CardFooter className="flex-col gap-3 pb-0">
-          <View className="flex-row items-center overflow-hidden">
-            <Text className="text-sm text-muted-foreground">Productivity:</Text>
-            <LayoutAnimationConfig skipEntering>
-              <Animated.View
-                key={progress}
-                entering={FadeInUp}
-                exiting={FadeOutDown}
-                className="w-11 items-center"
-              >
-                <Text className="text-sm font-bold text-lime-600">
-                  {progress}%
-                </Text>
-              </Animated.View>
-            </LayoutAnimationConfig>
-          </View>
-          <Progress
-            value={progress}
-            className="h-2"
-            indicatorClassName="bg-lime-600"
-          />
-          <View />
-          <Button
-            variant="outline"
-            className="shadow shadow-foreground/5"
-            onPress={updateProgressValue}
-          >
-            <Text>Update</Text>
-          </Button>
           <Button
             variant="outline"
             className="shadow shadow-foreground/5"

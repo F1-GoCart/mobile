@@ -6,10 +6,13 @@
     "start": "expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",
+    "lint": "expo lint",
+    "update-types": "supabase gen types typescript --project-id fgupppcvyddxuttscnpn > lib/database.types.ts",
     "clean": "rm -rf .expo node_modules",
     "postinstall": "npx tailwindcss -i ./global.css -o ./node_modules/.cache/nativewind/global.css"
   },
   "dependencies": {
+    "@dev-plugins/react-query": "^0.1.0",
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-native-google-signin/google-signin": "^13.1.0",
     "@react-navigation/native": "^7.0.0",
@@ -20,6 +23,7 @@
     "@rn-primitives/tooltip": "~1.1.0",
     "@rn-primitives/types": "~1.1.0",
     "@supabase/supabase-js": "^2.47.16",
+    "@tanstack/react-query": "^5.66.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "expo": "^52.0.25",
@@ -49,10 +53,14 @@
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",
+    "@tanstack/eslint-plugin-query": "^5.66.0",
     "@types/react": "~18.3.12",
+    "eslint": "^8.57.0",
+    "eslint-config-expo": "~8.0.1",
     "prettier": "^3.4.2",
     "prettier-plugin-tailwindcss": "^0.6.10",
     "react-native-svg-transformer": "^1.5.0",
+    "supabase": "^2.9.6",
     "typescript": "^5.3.3"
   },
   "private": true

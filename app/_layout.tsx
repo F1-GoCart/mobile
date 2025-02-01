@@ -21,6 +21,8 @@ import { Toaster } from "sonner-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { supabase } from "~/lib/supabase";
 import useAuthStore from "~/stores/AuthStore";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useReactQueryDevTools } from "@dev-plugins/react-query";
 
 const LIGHT_THEME: Theme = {
   ...DefaultTheme,
@@ -36,6 +38,8 @@ export {
   ErrorBoundary,
 } from "expo-router";
 
+const queryClient = new QueryClient();
+
 GoogleSignin.configure({
   webClientId:
     "894661082702-svtpejtro8khh3rjshgm357i1oul2u5n.apps.googleusercontent.com",
@@ -47,6 +51,7 @@ export default function RootLayout() {
   const hasMounted = useRef(false);
   const { colorScheme, isDarkColorScheme } = useColorScheme();
   const [isColorSchemeLoaded, setIsColorSchemeLoaded] = useState(false);
+  useReactQueryDevTools(queryClient);
 
   useLayoutEffect(() => {
     if (hasMounted.current) {
@@ -74,18 +79,20 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
-      <GestureHandlerRootView>
-        <StatusBar style={isDarkColorScheme ? "light" : "dark"} />
-        <Stack
-          screenOptions={{
-            headerShown: false,
-            animation: "fade_from_bottom",
-          }}
-        />
-        <Toaster />
-        <PortalHost />
-      </GestureHandlerRootView>
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
+        <GestureHandlerRootView>
+          <StatusBar style={isDarkColorScheme ? "light" : "dark"} />
+          <Stack
+            screenOptions={{
+              headerShown: false,
+              animation: "fade_from_bottom",
+            }}
+          />
+          <Toaster />
+          <PortalHost />
+        </GestureHandlerRootView>
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 }
