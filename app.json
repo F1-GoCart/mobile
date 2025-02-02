@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "F1: Go Cart",
+    "name": "GO CART",
     "slug": "f1-gocart-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -18,8 +18,9 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/images/adaptive-icon-foreground.png",
+        "monochromeImage": "./assets/images/adaptive-icon-monochrome.png",
+        "backgroundImage": "./assets/images/adaptive-icon-background.png"
       },
       "package": "io.github.f1_gocart.mobile"
     },
