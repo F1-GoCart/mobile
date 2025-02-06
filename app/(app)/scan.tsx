@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   View,
   Dimensions,
@@ -12,21 +12,37 @@ import {
   useCameraPermissions,
 } from "expo-camera";
 import { supabase } from "~/lib/supabase";
-import { useFocusEffect, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { toast } from "sonner-native";
+
 interface QrBounds {
   width: number;
   height: number;
   originX: number;
   originY: number;
 }
+
 export default function BarcodeScanner() {
-  const screenWidth = Dimensions.get("window").width;
-  const screenHeight = Dimensions.get("window").height;
   const [scanned, setScanned] = useState<boolean>(false);
   const [scannedData, setScannedData] = useState<string | null>(null);
   const [barcodeBounds, setBarcodeBounds] = useState<QrBounds | null>(null);
+  const [permission, requestPermission] = useCameraPermissions();
+  const permissionDenied = useRef(false);
   const router = useRouter();
+
+  useEffect(() => {
+    if (permissionDenied.current) return;
+    if (permission && !permission.granted) {
+      requestPermission().then((result) => {
+        if (!result.granted) {
+          permissionDenied.current = true;
+          toast.error("Camera permission is required to scan QR codes.");
+          router.back();
+        }
+      });
+    }
+  }, [permission]);
+
   const onBarcodeScanned = (result: BarcodeScanningResult) => {
     const { origin, size } = result.bounds;
     setScanned(true);
@@ -39,6 +55,7 @@ export default function BarcodeScanner() {
     setScannedData(result.data);
     console.log("Scanned Data:", scannedData);
   };
+
   const startSession = async () => {
     const { error } = await supabase
       .from("shopping_carts")
@@ -48,24 +65,8 @@ export default function BarcodeScanner() {
       console.error("Error updating status: ", error.message);
     }
   };
-  const [permission, requestPermission] = useCameraPermissions();
-  const permissionDenied = useRef(false);
-
-  useEffect(() => {
-    console.log(permissionDenied.current);
-    if (permissionDenied.current) return;
-
-    console.log(permission);
-    if (permission && !permission.granted) {
-      requestPermission().then((result) => {
-        if (!result.granted) {
-          permissionDenied.current = true;
-          toast.error("Camera permission is required to scan QR codes.");
-          router.back();
-        }
-      });
-    }
-  }, [permission]);
+  const screenWidth = Dimensions.get("window").width;
+  const screenHeight = Dimensions.get("window").height;
 
   if (!permission) {
     return <ActivityIndicator />;
