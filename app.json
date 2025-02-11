@@ -24,7 +24,18 @@
       },
       "package": "io.github.f1_gocart.mobile"
     },
-    "plugins": ["expo-router", ["@react-native-google-signin/google-signin"]],
+    "plugins": [
+      "expo-router",
+      ["@react-native-google-signin/google-signin"],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
+          "recordAudioAndroid": true
+        }
+      ]
+    ],
     "experiments": {
       "typedRoutes": true
     }
