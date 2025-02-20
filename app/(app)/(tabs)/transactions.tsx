@@ -28,7 +28,8 @@ export default function Screen() {
       const { data, error } = await supabase
         .from("purchase_history")
         .select()
-        .eq("user_id", session.user.id);
+        .eq("user_id", session.user.id)
+        .order("datetime", { ascending: false });
 
       if (error) {
         throw error;

@@ -15,10 +15,10 @@ export type Database = {
           category: string | null
           created_at: string
           id: number
-          image: string | null
+          image: string
           is_sale: boolean | null
           name: string | null
-          price: number | null
+          price: number
           promo_price: number | null
           size: string | null
           stock: number | null
@@ -28,10 +28,10 @@ export type Database = {
           category?: string | null
           created_at?: string
           id?: number
-          image?: string | null
+          image: string
           is_sale?: boolean | null
           name?: string | null
-          price?: number | null
+          price: number
           promo_price?: number | null
           size?: string | null
           stock?: number | null
@@ -41,10 +41,10 @@ export type Database = {
           category?: string | null
           created_at?: string
           id?: number
-          image?: string | null
+          image?: string
           is_sale?: boolean | null
           name?: string | null
-          price?: number | null
+          price?: number
           promo_price?: number | null
           size?: string | null
           stock?: number | null
@@ -57,7 +57,7 @@ export type Database = {
           cart_id: number | null
           change: number
           created_at: string
-          datetime: string | null
+          datetime: string
           id: string
           mode_of_payment: string | null
           total_price: number | null
@@ -68,7 +68,7 @@ export type Database = {
           cart_id?: number | null
           change?: number
           created_at?: string
-          datetime?: string | null
+          datetime: string
           id?: string
           mode_of_payment?: string | null
           total_price?: number | null
@@ -79,7 +79,7 @@ export type Database = {
           cart_id?: number | null
           change?: number
           created_at?: string
-          datetime?: string | null
+          datetime?: string
           id?: string
           mode_of_payment?: string | null
           total_price?: number | null
@@ -106,17 +106,17 @@ export type Database = {
         Row: {
           id: string
           item_id: number
-          quantity: number | null
+          quantity: number
         }
         Insert: {
           id: string
           item_id: number
-          quantity?: number | null
+          quantity: number
         }
         Update: {
           id?: string
           item_id?: number
-          quantity?: number | null
+          quantity?: number
         }
         Relationships: [
           {
