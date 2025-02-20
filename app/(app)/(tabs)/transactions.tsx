@@ -1,4 +1,10 @@
-import { FlatList, Pressable, RefreshControl, View } from "react-native";
+import {
+  ActivityIndicator,
+  FlatList,
+  Pressable,
+  RefreshControl,
+  View,
+} from "react-native";
 import { Text } from "~/components/ui/text";
 import useAuthStore from "~/stores/AuthStore";
 import { Calendar } from "~/lib/icons/Calendar";
@@ -38,6 +44,15 @@ export default function Screen() {
       return data;
     },
   });
+
+  if (status === "pending") {
+    return <ActivityIndicator />;
+  }
+
+  if (status === "error") {
+    toast.error(error.message);
+  }
+
   return (
     <FlatList
       data={transactions}
