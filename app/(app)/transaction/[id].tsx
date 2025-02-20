@@ -16,9 +16,11 @@ import {
 import { supabase } from "~/lib/supabase";
 import useAuthStore from "~/stores/AuthStore";
 import { useQuery } from "@tanstack/react-query";
+import { Stack, useLocalSearchParams } from "expo-router";
 
 export default function Screen() {
   const { session } = useAuthStore();
+  const { id } = useLocalSearchParams();
 
   if (!session) {
     return null;
@@ -55,6 +57,11 @@ export default function Screen() {
 
   return (
     <View className="flex-1 items-center justify-center gap-5 bg-secondary/30 p-6">
+      <Stack.Screen
+        options={{
+          title: "Transaction Details",
+        }}
+      />
       <Card className="w-full max-w-sm rounded-2xl p-6">
         <CardHeader className="items-center">
           <Avatar alt="Your Avatar" className="h-24 w-24">
@@ -62,11 +69,11 @@ export default function Screen() {
           </Avatar>
           <View className="p-3" />
           <CardTitle className="pb-2 text-center">
-            This is the notifications page
+            This is the transaction page.
           </CardTitle>
           <View className="flex-row">
             <CardDescription className="text-base font-semibold">
-              {user.email}
+              {id}
             </CardDescription>
             <Tooltip delayDuration={150}>
               <TooltipTrigger className="px-2 pb-0.5 active:opacity-50">

@@ -7,6 +7,7 @@ import { supabase } from "~/lib/supabase";
 import { useQuery } from "@tanstack/react-query";
 import { CreditCard } from "~/lib/icons/CreditCard";
 import { toast } from "sonner-native";
+import { Link } from "expo-router";
 
 export default function Screen() {
   const { session } = useAuthStore();
@@ -49,45 +50,46 @@ export default function Screen() {
       )}
       renderItem={({ item }) => (
         <View className="m-2 overflow-hidden rounded-xl">
-          <Pressable
-            onPress={() => toast.success("Transaction details")}
-            android_ripple={{ color: "gray" }}
-            className="p-3"
+          <Link
+            href={{ pathname: "/transaction/[id]", params: { id: item.id } }}
+            asChild
           >
-            <View className="w-full flex-row items-center gap-3">
-              <Avatar alt="Cart id">
-                {item.mode_of_payment === "gcash" && (
-                  <AvatarImage
-                    source={require("~/assets/images/logos/gcash.jpg")}
-                  />
-                )}
-                <AvatarFallback>
-                  {item.mode_of_payment === "card" ? (
-                    <CreditCard size={20} color="gray" />
-                  ) : (
-                    <Text>{`C${item.cart_id}`}</Text>
+            <Pressable android_ripple={{ color: "gray" }} className="p-3">
+              <View className="w-full flex-row items-center gap-3">
+                <Avatar alt="Cart id">
+                  {item.mode_of_payment === "gcash" && (
+                    <AvatarImage
+                      source={require("~/assets/images/logos/gcash.jpg")}
+                    />
                   )}
-                </AvatarFallback>
-              </Avatar>
-              <View className="flex-1">
-                <Text className="font-bold">{`Cart ${item.cart_id}`}</Text>
-                <View className="flex-row items-center gap-2">
-                  <Calendar size={15} color="gray" />
-                  <Text className="text-gray-500">
-                    {new Date(item.datetime!).toLocaleString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                      hour: "numeric",
-                      minute: "numeric",
-                      hour12: true,
-                    })}
-                  </Text>
+                  <AvatarFallback>
+                    {item.mode_of_payment === "card" ? (
+                      <CreditCard size={20} color="gray" />
+                    ) : (
+                      <Text>{`C${item.cart_id}`}</Text>
+                    )}
+                  </AvatarFallback>
+                </Avatar>
+                <View className="flex-1">
+                  <Text className="font-bold">{`Cart ${item.cart_id}`}</Text>
+                  <View className="flex-row items-center gap-2">
+                    <Calendar size={15} color="gray" />
+                    <Text className="text-gray-500">
+                      {new Date(item.datetime!).toLocaleString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                        hour: "numeric",
+                        minute: "numeric",
+                        hour12: true,
+                      })}
+                    </Text>
+                  </View>
                 </View>
+                <Text className="text-right font-bold">{`₱${item.total_price!.toFixed(2)}`}</Text>
               </View>
-              <Text className="text-right font-bold">{`₱${item.total_price!.toFixed(2)}`}</Text>
-            </View>
-          </Pressable>
+            </Pressable>
+          </Link>
         </View>
       )}
     />
