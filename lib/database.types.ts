@@ -15,10 +15,10 @@ export type Database = {
           category: string | null
           created_at: string
           id: number
-          image: string | null
+          image: string
           is_sale: boolean | null
           name: string | null
-          price: number | null
+          price: number
           promo_price: number | null
           size: string | null
           stock: number | null
@@ -28,10 +28,10 @@ export type Database = {
           category?: string | null
           created_at?: string
           id?: number
-          image?: string | null
+          image: string
           is_sale?: boolean | null
           name?: string | null
-          price?: number | null
+          price: number
           promo_price?: number | null
           size?: string | null
           stock?: number | null
@@ -41,10 +41,10 @@ export type Database = {
           category?: string | null
           created_at?: string
           id?: number
-          image?: string | null
+          image?: string
           is_sale?: boolean | null
           name?: string | null
-          price?: number | null
+          price?: number
           promo_price?: number | null
           size?: string | null
           stock?: number | null
@@ -55,36 +55,33 @@ export type Database = {
         Row: {
           billing: Json | null
           cart_id: number | null
-          change: number | null
+          change: number
           created_at: string
-          datetime: string | null
+          datetime: string
           id: string
           mode_of_payment: string | null
-          purchased_items: Json | null
           total_price: number | null
           user_id: string | null
         }
         Insert: {
           billing?: Json | null
           cart_id?: number | null
-          change?: number | null
+          change?: number
           created_at?: string
-          datetime?: string | null
-          id: string
+          datetime: string
+          id?: string
           mode_of_payment?: string | null
-          purchased_items?: Json | null
           total_price?: number | null
           user_id?: string | null
         }
         Update: {
           billing?: Json | null
           cart_id?: number | null
-          change?: number | null
+          change?: number
           created_at?: string
-          datetime?: string | null
+          datetime?: string
           id?: string
           mode_of_payment?: string | null
-          purchased_items?: Json | null
           total_price?: number | null
           user_id?: string | null
         }
@@ -101,6 +98,39 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      purchased_items: {
+        Row: {
+          id: string
+          item_id: number
+          quantity: number
+        }
+        Insert: {
+          id: string
+          item_id: number
+          quantity: number
+        }
+        Update: {
+          id?: string
+          item_id?: number
+          quantity?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchased_items_id_fkey"
+            columns: ["id"]
+            isOneToOne: false
+            referencedRelation: "purchase_history"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "purchased_items_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "product_details"
             referencedColumns: ["id"]
           },
         ]
@@ -133,19 +163,19 @@ export type Database = {
       }
       shopping_carts: {
         Row: {
-          cart_id: string | null
+          cart_id: string
           id: number
-          status: string | null
+          status: string
         }
         Insert: {
-          cart_id?: string | null
+          cart_id?: string
           id?: number
-          status?: string | null
+          status: string
         }
         Update: {
-          cart_id?: string | null
+          cart_id?: string
           id?: number
-          status?: string | null
+          status?: string
         }
         Relationships: []
       }

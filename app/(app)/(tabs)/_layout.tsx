@@ -3,6 +3,8 @@ import { ScanLine } from "lucide-react-native";
 import { View } from "react-native";
 import { Home } from "~/lib/icons/Home";
 import { User } from "~/lib/icons/User";
+import { ReceiptText } from "~/lib/icons/ReceiptText";
+import { Bell } from "~/lib/icons/Bell";
 
 export default function TabsLayout() {
   return (
@@ -16,6 +18,10 @@ export default function TabsLayout() {
         tabBarItemStyle: {
           margin: 5,
         },
+        tabBarLabelStyle: {
+          // Do not cut off text wtih ellipsis
+          fontSize: 7,
+        },
       }}
     >
       <Tabs.Screen
@@ -24,6 +30,16 @@ export default function TabsLayout() {
           title: "Home",
           tabBarIcon({ color, size }) {
             return <Home color={color} size={size} />;
+          },
+        }}
+      />
+      <Tabs.Screen
+        name="transactions"
+        options={{
+          title: "Transactions",
+          headerShown: true,
+          tabBarIcon({ color, size }) {
+            return <ReceiptText color={color} size={size} />;
           },
         }}
       />
@@ -68,6 +84,15 @@ export default function TabsLayout() {
             navigation.navigate("scan");
           },
         })}
+      />
+      <Tabs.Screen
+        name="notifications"
+        options={{
+          title: "Notifications",
+          tabBarIcon({ color, size }) {
+            return <Bell color={color} size={size} />;
+          },
+        }}
       />
       <Tabs.Screen
         name="profile"
