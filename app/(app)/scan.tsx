@@ -14,6 +14,7 @@ import {
 import { supabase } from "~/lib/supabase";
 import { useRouter } from "expo-router";
 import { toast } from "sonner-native";
+import useAuthStore from "~/stores/AuthStore";
 
 interface QrBounds {
   width: number;
@@ -29,6 +30,7 @@ export default function BarcodeScanner() {
   const [permission, requestPermission] = useCameraPermissions();
   const permissionDenied = useRef(false);
   const router = useRouter();
+  const { session } = useAuthStore();
 
   useEffect(() => {
     if (permissionDenied.current) return;
@@ -56,21 +58,26 @@ export default function BarcodeScanner() {
     console.log("Scanned Data:", scannedData);
   };
 
-  const startSession = async () => {
-    const { error } = await supabase
-      .from("shopping_carts")
-      .update({ status: "in_use" })
-      .eq("cart_id", scannedData!);
-    if (error) {
-      console.error("Error updating status: ", error.message);
-    }
-  };
   const screenWidth = Dimensions.get("window").width;
   const screenHeight = Dimensions.get("window").height;
 
   if (!permission) {
     return <ActivityIndicator />;
   }
+
+  if (!session) {
+    return null;
+  }
+
+  const startSession = async () => {
+    const { error } = await supabase
+      .from("shopping_carts")
+      .update({ status: "in_use", user_id: session.user.id })
+      .eq("cart_id", scannedData!);
+    if (error) {
+      console.error("Error updating status: ", error.message);
+    }
+  };
 
   return (
     <View style={{ flex: 1 }}>
