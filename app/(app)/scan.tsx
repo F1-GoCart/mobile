@@ -76,7 +76,12 @@ export default function BarcodeScanner() {
       .eq("cart_id", scannedData!);
     if (error) {
       console.error("Error updating status: ", error.message);
+      return;
     }
+    setScannedData(null);
+    setScanned(false);
+    toast.success("Cart activated!");
+    router.back();
   };
 
   return (
