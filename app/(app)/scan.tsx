@@ -47,7 +47,38 @@ export default function BarcodeScanner() {
 
   const onBarcodeScanned = (result: BarcodeScanningResult) => {
     const { origin, size } = result.bounds;
+
     setScanned(true);
+    if (result.data.startsWith("payment:")) {
+      if (!scanned) {
+        const paymentChannel = supabase.channel(result.data, {
+          config: {
+            broadcast: { ack: true },
+          },
+        });
+
+        paymentChannel.subscribe(async (status) => {
+          if (status !== "SUBSCRIBED") {
+            return null;
+          }
+
+          const serverResponse = await paymentChannel.send({
+            type: "broadcast",
+            event: "payment",
+            payload: { success: true, code: "SUCCESSFUL_PAYMENT" },
+          });
+        });
+
+        const transactionId = result.data.split(":")[1];
+        setTimeout(() => {
+          router.replace(`/transaction/${transactionId}`);
+        }, 1500);
+        router.replace(`/transaction/${transactionId}`);
+        return;
+      }
+      return;
+    }
+
     setBarcodeBounds({
       width: size.width,
       height: size.height,
@@ -55,7 +86,6 @@ export default function BarcodeScanner() {
       originY: origin.y,
     });
     setScannedData(result.data);
-    console.log("Scanned Data:", scannedData);
   };
 
   const screenWidth = Dimensions.get("window").width;
