@@ -22,6 +22,13 @@ export default function AppLayout() {
           title: "Scan",
         }}
       />
+      <Stack.Screen
+        name="confirm/[id]"
+        options={{
+          title: "Confirm",
+          headerShown: false,
+        }}
+      />
     </Stack>
   );
 }

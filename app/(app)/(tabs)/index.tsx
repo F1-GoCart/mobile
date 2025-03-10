@@ -19,7 +19,7 @@ import { supabase } from "~/lib/supabase";
 import useAuthStore from "~/stores/AuthStore";
 import { useQuery } from "@tanstack/react-query";
 import { useFocusEffect } from "expo-router";
-import { useCallback } from "react";
+import React, { useCallback } from "react";
 
 export default function Screen() {
   const { session } = useAuthStore();

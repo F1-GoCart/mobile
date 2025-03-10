@@ -25,7 +25,6 @@ interface QrBounds {
 
 export default function BarcodeScanner() {
   const [scanned, setScanned] = useState<boolean>(false);
-  const [scannedData, setScannedData] = useState<string | null>(null);
   const [barcodeBounds, setBarcodeBounds] = useState<QrBounds | null>(null);
   const [permission, requestPermission] = useCameraPermissions();
   const permissionDenied = useRef(false);
@@ -79,13 +78,17 @@ export default function BarcodeScanner() {
       return;
     }
 
+    if (result.data.startsWith("go-cart-")) {
+      router.push({ pathname: `/confirm/[id]`, params: { id: result.data } });
+      return;
+    }
+
     setBarcodeBounds({
       width: size.width,
       height: size.height,
       originX: origin.x,
       originY: origin.y,
     });
-    setScannedData(result.data);
   };
 
   const screenWidth = Dimensions.get("window").width;
@@ -98,21 +101,6 @@ export default function BarcodeScanner() {
   if (!session) {
     return null;
   }
-
-  const startSession = async () => {
-    const { error } = await supabase
-      .from("shopping_carts")
-      .update({ status: "in_use", user_id: session.user.id })
-      .eq("cart_id", scannedData!);
-    if (error) {
-      console.error("Error updating status: ", error.message);
-      return;
-    }
-    setScannedData(null);
-    setScanned(false);
-    toast.success("Cart activated!");
-    router.back();
-  };
 
   return (
     <View style={{ flex: 1 }}>
@@ -163,26 +151,6 @@ export default function BarcodeScanner() {
             <View className="absolute bottom-0 right-0 h-8 w-8 rounded-br-lg border-b-[3px] border-r-[3px] border-white" />
           </View>
         )
-      )}
-      {scannedData && (
-        <View
-          style={{
-            position: "absolute",
-            bottom: 20,
-            alignSelf: "center",
-            backgroundColor: "white",
-            padding: 10,
-            borderRadius: 5,
-          }}
-        >
-          <Text>Scanned Data: {scannedData}</Text>
-          <TouchableOpacity
-            className="rounded bg-blue-500 px-4 py-2"
-            onPress={startSession}
-          >
-            <Text className="font-bold text-white">Activate Cart!</Text>
-          </TouchableOpacity>
-        </View>
       )}
     </View>
   );
