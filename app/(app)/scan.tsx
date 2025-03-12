@@ -65,6 +65,7 @@ export default function BarcodeScanner() {
       console.error("Error updating status: ", error.message);
     }
   };
+
   const screenWidth = Dimensions.get("window").width;
   const screenHeight = Dimensions.get("window").height;
 

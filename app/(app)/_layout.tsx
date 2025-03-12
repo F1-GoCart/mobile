@@ -22,6 +22,12 @@ export default function AppLayout() {
           title: "Scan",
         }}
       />
+      <Stack.Screen
+        name="list"
+        options={{
+          title: "Shopping List",
+        }}
+      />
     </Stack>
   );
 }
