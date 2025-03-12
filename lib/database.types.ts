@@ -68,7 +68,7 @@ export type Database = {
           cart_id?: number | null
           change?: number
           created_at?: string
-          datetime: string
+          datetime?: string
           id?: string
           mode_of_payment?: string | null
           total_price?: number | null
@@ -137,21 +137,31 @@ export type Database = {
       }
       scanned_items: {
         Row: {
-          id: number
-          item_id: number | null
-          status: boolean | null
+          cart_id: number
+          item_id: number
+          quantity: number | null
+          scanned_date: string
         }
         Insert: {
-          id?: number
-          item_id?: number | null
-          status?: boolean | null
+          cart_id: number
+          item_id: number
+          quantity?: number | null
+          scanned_date: string
         }
         Update: {
-          id?: number
-          item_id?: number | null
-          status?: boolean | null
+          cart_id?: number
+          item_id?: number
+          quantity?: number | null
+          scanned_date?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "scanned_items_cart_id_fkey"
+            columns: ["cart_id"]
+            isOneToOne: false
+            referencedRelation: "shopping_carts"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "scanned_items_item_id_fkey"
             columns: ["item_id"]
@@ -166,49 +176,53 @@ export type Database = {
           cart_id: string
           id: number
           status: string
+          user_id: string | null
         }
         Insert: {
           cart_id?: string
           id?: number
           status: string
+          user_id?: string | null
         }
         Update: {
           cart_id?: string
           id?: number
           status?: string
-        }
-        Relationships: []
-      }
-      shopping_list: {
-        Row: {
-          created_at: string
-          id: number
-          is_deleted: boolean | null
-          item_id: number | null
-          user_id: string | null
-        }
-        Insert: {
-          created_at?: string
-          id?: number
-          is_deleted?: boolean | null
-          item_id?: number | null
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string
-          id?: number
-          is_deleted?: boolean | null
-          item_id?: number | null
           user_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "shopping_list_item_id_fkey"
-            columns: ["item_id"]
+            foreignKeyName: "shopping_carts_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "product_details"
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
+        ]
+      }
+      shopping_list: {
+        Row: {
+          checked: boolean | null
+          created_at: string
+          id: number
+          item_name: string | null
+          user_id: string | null
+        }
+        Insert: {
+          checked?: boolean | null
+          created_at?: string
+          id?: number
+          item_name?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          checked?: boolean | null
+          created_at?: string
+          id?: number
+          item_name?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
           {
             foreignKeyName: "shopping_list_user_id_fkey"
             columns: ["user_id"]
