@@ -29,6 +29,12 @@ export default function AppLayout() {
           headerShown: false,
         }}
       />
+      <Stack.Screen
+        name="list"
+        options={{
+          title: "Shopping List",
+        }}
+      />
     </Stack>
   );
 }
