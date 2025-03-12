@@ -14,6 +14,7 @@ import {
 import { supabase } from "~/lib/supabase";
 import { useRouter } from "expo-router";
 import { toast } from "sonner-native";
+import useAuthStore from "~/stores/AuthStore";
 
 interface QrBounds {
   width: number;
@@ -24,11 +25,11 @@ interface QrBounds {
 
 export default function BarcodeScanner() {
   const [scanned, setScanned] = useState<boolean>(false);
-  const [scannedData, setScannedData] = useState<string | null>(null);
   const [barcodeBounds, setBarcodeBounds] = useState<QrBounds | null>(null);
   const [permission, requestPermission] = useCameraPermissions();
   const permissionDenied = useRef(false);
   const router = useRouter();
+  const { session } = useAuthStore();
 
   useEffect(() => {
     if (permissionDenied.current) return;
@@ -45,25 +46,49 @@ export default function BarcodeScanner() {
 
   const onBarcodeScanned = (result: BarcodeScanningResult) => {
     const { origin, size } = result.bounds;
+
     setScanned(true);
+    if (result.data.startsWith("payment:")) {
+      if (!scanned) {
+        const paymentChannel = supabase.channel(result.data, {
+          config: {
+            broadcast: { ack: true },
+          },
+        });
+
+        paymentChannel.subscribe(async (status) => {
+          if (status !== "SUBSCRIBED") {
+            return null;
+          }
+
+          const serverResponse = await paymentChannel.send({
+            type: "broadcast",
+            event: "payment",
+            payload: { success: true, code: "SUCCESSFUL_PAYMENT" },
+          });
+        });
+
+        const transactionId = result.data.split(":")[1];
+        setTimeout(() => {
+          router.replace(`/transaction/${transactionId}`);
+        }, 1500);
+        router.replace(`/transaction/${transactionId}`);
+        return;
+      }
+      return;
+    }
+
+    if (result.data.startsWith("go-cart-")) {
+      router.push({ pathname: `/confirm/[id]`, params: { id: result.data } });
+      return;
+    }
+
     setBarcodeBounds({
       width: size.width,
       height: size.height,
       originX: origin.x,
       originY: origin.y,
     });
-    setScannedData(result.data);
-    console.log("Scanned Data:", scannedData);
-  };
-
-  const startSession = async () => {
-    const { error } = await supabase
-      .from("shopping_carts")
-      .update({ status: "in_use" })
-      .eq("cart_id", scannedData!);
-    if (error) {
-      console.error("Error updating status: ", error.message);
-    }
   };
 
   const screenWidth = Dimensions.get("window").width;
@@ -71,6 +96,10 @@ export default function BarcodeScanner() {
 
   if (!permission) {
     return <ActivityIndicator />;
+  }
+
+  if (!session) {
+    return null;
   }
 
   return (
@@ -122,26 +151,6 @@ export default function BarcodeScanner() {
             <View className="absolute bottom-0 right-0 h-8 w-8 rounded-br-lg border-b-[3px] border-r-[3px] border-white" />
           </View>
         )
-      )}
-      {scannedData && (
-        <View
-          style={{
-            position: "absolute",
-            bottom: 20,
-            alignSelf: "center",
-            backgroundColor: "white",
-            padding: 10,
-            borderRadius: 5,
-          }}
-        >
-          <Text>Scanned Data: {scannedData}</Text>
-          <TouchableOpacity
-            className="rounded bg-blue-500 px-4 py-2"
-            onPress={startSession}
-          >
-            <Text className="font-bold text-white">Activate Cart!</Text>
-          </TouchableOpacity>
-        </View>
       )}
     </View>
   );

@@ -1,12 +1,21 @@
 import { Tabs } from "expo-router";
 import { ScanLine } from "lucide-react-native";
 import { View } from "react-native";
-import { Home } from "~/lib/icons/Home";
 import { User } from "~/lib/icons/User";
 import { ReceiptText } from "~/lib/icons/ReceiptText";
-import { Bell } from "~/lib/icons/Bell";
+import { supabase } from "~/lib/supabase";
+import useAuthStore from "~/stores/AuthStore";
+import { toast } from "sonner-native";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function TabsLayout() {
+  const { session } = useAuthStore();
+  const queryClient = useQueryClient();
+
+  if (!session) {
+    return null;
+  }
+
   return (
     <Tabs
       screenOptions={{
@@ -24,15 +33,6 @@ export default function TabsLayout() {
         },
       }}
     >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: "Home",
-          tabBarIcon({ color, size }) {
-            return <Home color={color} size={size} />;
-          },
-        }}
-      />
       <Tabs.Screen
         name="transactions"
         options={{
@@ -79,29 +79,48 @@ export default function TabsLayout() {
           },
         }}
         listeners={({ navigation }) => ({
-          tabPress: (e) => {
+          tabPress: async (e) => {
             e.preventDefault();
+            const { data, error } = await supabase
+              .from("shopping_carts")
+              .select()
+              .eq("status", "in_use")
+              .eq("user_id", session.user.id)
+              .maybeSingle();
+
+            if (error) {
+              console.error("Error fetching cart: ", error.message);
+              return;
+            }
+
+            if (data) {
+              toast.error("You already have an active cart.");
+              return;
+            }
+
+            navigation.navigate("scan");
+          },
+          tabLongPress: () => {
             navigation.navigate("scan");
           },
         })}
       />
       <Tabs.Screen
-        name="notifications"
-        options={{
-          title: "Notifications",
-          tabBarIcon({ color, size }) {
-            return <Bell color={color} size={size} />;
-          },
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
+        name="index"
         options={{
           title: "User Profile",
           tabBarIcon({ color, size }) {
             return <User color={color} size={size} />;
           },
         }}
+        listeners={() => ({
+          tabPress: () => {
+            queryClient.invalidateQueries({
+              queryKey: ["cart", session.user.id],
+              refetchType: "all",
+            });
+          },
+        })}
       />
     </Tabs>
   );

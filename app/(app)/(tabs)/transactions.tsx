@@ -73,13 +73,13 @@ export default function Screen() {
             <Pressable android_ripple={{ color: "gray" }} className="p-3">
               <View className="w-full flex-row items-center gap-3">
                 <Avatar alt="Cart id">
-                  {item.mode_of_payment === "gcash" && (
+                  {item.mode_of_payment?.toLowerCase() === "gcash" && (
                     <AvatarImage
                       source={require("~/assets/images/logos/gcash.jpg")}
                     />
                   )}
                   <AvatarFallback>
-                    {item.mode_of_payment === "card" ? (
+                    {item.mode_of_payment?.toLowerCase() === "card" ? (
                       <CreditCard size={20} color="gray" />
                     ) : (
                       <Text>{`C${item.cart_id}`}</Text>

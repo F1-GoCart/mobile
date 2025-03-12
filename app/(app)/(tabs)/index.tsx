@@ -18,6 +18,8 @@ import {
 import { supabase } from "~/lib/supabase";
 import useAuthStore from "~/stores/AuthStore";
 import { useQuery } from "@tanstack/react-query";
+import { useFocusEffect } from "expo-router";
+import React, { useCallback } from "react";
 
 export default function Screen() {
   const { session } = useAuthStore();
@@ -47,12 +49,45 @@ export default function Screen() {
     },
   });
 
-  if (status === "pending") {
+  const {
+    data: cart,
+    status: cartStatus,
+    error: cartError,
+    refetch,
+  } = useQuery({
+    queryKey: ["cart", session.user.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("shopping_carts")
+        .select()
+        .eq("user_id", session.user.id)
+        .eq("status", "in_use")
+        .maybeSingle();
+
+      if (error) {
+        throw error;
+      }
+
+      return data;
+    },
+  });
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, []),
+  );
+
+  if (status === "pending" || cartStatus === "pending") {
     return <ActivityIndicator />;
   }
 
   if (status === "error") {
     return <Text>Error: {error.message}</Text>;
+  }
+
+  if (cartStatus === "error") {
+    return <Text>Error: {cartError.message}</Text>;
   }
 
   return (
@@ -63,9 +98,7 @@ export default function Screen() {
             <AvatarImage source={{ uri: user.avatar_url! }} />
           </Avatar>
           <View className="p-3" />
-          <CardTitle className="pb-2 text-center">
-            This is the home page
-          </CardTitle>
+          <CardTitle className="pb-2 text-center">{user.name}</CardTitle>
           <View className="flex-row">
             <CardDescription className="text-base font-semibold">
               {user.email}
@@ -79,11 +112,29 @@ export default function Screen() {
                 />
               </TooltipTrigger>
               <TooltipContent className="px-4 py-2 shadow">
-                <Text className="native:text-lg">Freelance</Text>
+                <Text className="native:text-lg">
+                  Member since {new Date(user.created_at).toLocaleDateString()}
+                </Text>
               </TooltipContent>
             </Tooltip>
           </View>
+          {cart && (
+            <Text className="mt-3 text-center text-foreground/70">
+              You are now using the following cart: {cart.cart_id}
+            </Text>
+          )}
         </CardHeader>
+        <CardFooter className="flex-col gap-3 pb-0">
+          <Button
+            variant="outline"
+            className="shadow shadow-foreground/5"
+            onPress={async () => {
+              await supabase.auth.signOut();
+            }}
+          >
+            <Text>Sign out</Text>
+          </Button>
+        </CardFooter>
       </Card>
     </View>
   );
