@@ -7,6 +7,7 @@ interface AuthState {
   session: Session | null | undefined;
   setSession: (session: Session | null) => void;
   login: (email: string, password: string) => Promise<User | AuthError | null>;
+  loginAnonymously: () => Promise<User | AuthError | null>;
   loginWithGoogle: () => Promise<User | AuthError | null>;
   register: (
     email: string,
@@ -28,6 +29,20 @@ const useAuthStore = create<AuthState>((set) => ({
     });
     if (error) return Promise.reject(error);
 
+    set({ session: data.session });
+    return Promise.resolve(data.user);
+  },
+  loginAnonymously: async () => {
+    const { data, error } = await supabase.auth.signInAnonymously({
+      options: {
+        data: {
+          name: "Nikos Pasion",
+          avatar_url:
+            "https://fgupppcvyddxuttscnpn.supabase.co/storage/v1/object/public/avatar//nikos.jpg",
+        },
+      },
+    });
+    if (error) return Promise.reject(error);
     set({ session: data.session });
     return Promise.resolve(data.user);
   },

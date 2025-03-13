@@ -1,27 +1,34 @@
-import { ActivityIndicator, View } from "react-native";
-import { Info } from "~/lib/icons/Info";
+import { ActivityIndicator, TouchableOpacity, View } from "react-native";
 import { Avatar, AvatarImage } from "~/components/ui/avatar";
-import { Button } from "~/components/ui/button";
 import {
   Card,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
 import { Text } from "~/components/ui/text";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "~/components/ui/tooltip";
 import { supabase } from "~/lib/supabase";
 import useAuthStore from "~/stores/AuthStore";
 import { useQuery } from "@tanstack/react-query";
-import { useFocusEffect } from "expo-router";
-import React, { useCallback } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import Feather from "@expo/vector-icons/Feather";
+import { useRouter } from "expo-router";
+import { Button } from "~/components/ui/button";
+
+const dec2hex = (dec: number) => {
+  return dec.toString(16).padStart(2, "0");
+};
+
+const generateId = (len: number) => {
+  var arr = new Uint8Array((len || 40) / 2);
+  crypto.getRandomValues(arr);
+  return Array.from(arr, dec2hex).join("");
+};
 
 export default function Screen() {
+  const router = useRouter();
+
   const { session } = useAuthStore();
 
   if (!session) {
@@ -49,36 +56,9 @@ export default function Screen() {
     },
   });
 
-  const {
-    data: cart,
-    status: cartStatus,
-    error: cartError,
-    refetch,
-  } = useQuery({
-    queryKey: ["cart", session.user.id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("shopping_carts")
-        .select()
-        .eq("user_id", session.user.id)
-        .eq("status", "in_use")
-        .maybeSingle();
+  const userId = generateId(12);
 
-      if (error) {
-        throw error;
-      }
-
-      return data;
-    },
-  });
-
-  useFocusEffect(
-    useCallback(() => {
-      refetch();
-    }, []),
-  );
-
-  if (status === "pending" || cartStatus === "pending") {
+  if (status === "pending") {
     return <ActivityIndicator />;
   }
 
@@ -86,56 +66,44 @@ export default function Screen() {
     return <Text>Error: {error.message}</Text>;
   }
 
-  if (cartStatus === "error") {
-    return <Text>Error: {cartError.message}</Text>;
-  }
-
   return (
-    <View className="flex-1 items-center justify-center gap-5 bg-secondary/30 p-6">
-      <Card className="w-full max-w-sm rounded-2xl p-6">
-        <CardHeader className="items-center">
-          <Avatar alt="Your Avatar" className="h-24 w-24">
+    <SafeAreaView className="flex-1 items-start justify-normal gap-2 bg-secondary/30 p-2 px-4">
+      <Card className="w-full border-0">
+        <CardHeader className="w-full flex-row items-center justify-between pr-24">
+          <Avatar alt="Your Avatar" className="h-14 w-14">
             <AvatarImage source={{ uri: user.avatar_url! }} />
           </Avatar>
-          <View className="p-3" />
-          <CardTitle className="pb-2 text-center">{user.name}</CardTitle>
-          <View className="flex-row">
-            <CardDescription className="text-base font-semibold">
-              {user.email}
+          <View>
+            <CardTitle>{user.name}</CardTitle>
+            <CardDescription>
+              {user.email ?? `${userId}@gocart.ph`}
             </CardDescription>
-            <Tooltip delayDuration={150}>
-              <TooltipTrigger className="px-2 pb-0.5 active:opacity-50">
-                <Info
-                  size={14}
-                  strokeWidth={2.5}
-                  className="h-4 w-4 text-foreground/70"
-                />
-              </TooltipTrigger>
-              <TooltipContent className="px-4 py-2 shadow">
-                <Text className="native:text-lg">
-                  Member since {new Date(user.created_at).toLocaleDateString()}
-                </Text>
-              </TooltipContent>
-            </Tooltip>
           </View>
-          {cart && (
-            <Text className="mt-3 text-center text-foreground/70">
-              You are now using the following cart: {cart.cart_id}
-            </Text>
-          )}
         </CardHeader>
-        <CardFooter className="flex-col gap-3 pb-0">
-          <Button
-            variant="outline"
-            className="shadow shadow-foreground/5"
-            onPress={async () => {
-              await supabase.auth.signOut();
-            }}
-          >
-            <Text>Sign out</Text>
-          </Button>
-        </CardFooter>
+        <Button
+          variant="outline"
+          className="shadow shadow-foreground/5"
+          onPress={async () => {
+            await supabase.auth.signOut();
+          }}
+        >
+          <Text>Sign out</Text>
+        </Button>
       </Card>
-    </View>
+      <View className="h-[0.55] w-[95%] self-center bg-black opacity-50" />
+      <View className="mt-6 w-full gap-2">
+        <TouchableOpacity
+          className="h-14 w-full flex-row items-center gap-2 rounded-lg bg-white px-4 shadow-2xl"
+          onPress={() => router.push("/list")}
+        >
+          <AntDesign name="shoppingcart" size={24} color="#0FA958" />
+          <Text className="font-semibold">Shopping List</Text>
+        </TouchableOpacity>
+        <TouchableOpacity className="h-14 w-full flex-row items-center gap-2 rounded-lg bg-white px-4 shadow-2xl">
+          <Feather name="settings" size={24} color="#0FA958" />
+          <Text className="font-semibold">Settings</Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
   );
 }

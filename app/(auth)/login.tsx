@@ -8,7 +8,7 @@ import { toast } from "sonner-native";
 import useAuthStore from "~/stores/AuthStore";
 
 export default function LoginScreen() {
-  const { loginWithGoogle } = useAuthStore();
+  const { loginWithGoogle, loginAnonymously } = useAuthStore();
   return (
     <View className="flex-1 items-center justify-center gap-5 bg-[#0FA958] px-3">
       <View className="w-[80%] items-center">
@@ -22,6 +22,32 @@ export default function LoginScreen() {
             try {
               await loginWithGoogle();
             } catch (error: any) {
+              if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+                toast.error("Login cancelled", {
+                  duration: 2500,
+                });
+              } else if (error.code === statusCodes.IN_PROGRESS) {
+                toast.error("Operation is already in progress", {
+                  duration: 2500,
+                });
+              } else if (
+                error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE
+              ) {
+                toast.error("Play services not available", {
+                  duration: 2500,
+                });
+              } else {
+                toast.error("Something went wrong", {
+                  duration: 2500,
+                });
+              }
+            }
+          }}
+          onLongPress={async () => {
+            try {
+              await loginAnonymously();
+            } catch (error: any) {
+              console.log(error);
               if (error.code === statusCodes.SIGN_IN_CANCELLED) {
                 toast.error("Login cancelled", {
                   duration: 2500,
