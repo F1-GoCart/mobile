@@ -16,8 +16,7 @@ import { useColorScheme } from "~/lib/useColorScheme";
 import { PortalHost } from "@rn-primitives/portal";
 import { setAndroidNavigationBar } from "~/lib/android-navigation-bar";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { GoogleSignin } from "@react-native-google-signin/google-signin";
-import { Appearance } from "react-native";
+import { Appearance, Platform } from "react-native";
 import { Toaster } from "sonner-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { supabase } from "~/lib/supabase";
@@ -41,10 +40,15 @@ export {
 
 const queryClient = new QueryClient();
 
-GoogleSignin.configure({
-  webClientId:
-    "894661082702-svtpejtro8khh3rjshgm357i1oul2u5n.apps.googleusercontent.com",
-});
+if (Platform.OS === "android") {
+  const GoogleSignin =
+    require("@react-native-google-signin/google-signin").GoogleSignin;
+
+  GoogleSignin.configure({
+    webClientId:
+      "894661082702-svtpejtro8khh3rjshgm357i1oul2u5n.apps.googleusercontent.com",
+  });
+}
 
 Appearance.setColorScheme("light"); // Default to light theme
 

@@ -1,3 +1,4 @@
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { AuthError, Session, User } from "@supabase/supabase-js";
 import { create } from "zustand";
 import { supabase } from "~/lib/supabase";
@@ -46,7 +47,19 @@ const useAuthStore = create<AuthState>((set) => ({
     return Promise.resolve(data.user);
   },
   loginWithGoogle: async () => {
-    return Promise.reject(new Error("Not supported in IOS"));
+    await GoogleSignin.hasPlayServices();
+    const userInfo = await GoogleSignin.signIn();
+    if (userInfo.data?.idToken) {
+      const { data, error } = await supabase.auth.signInWithIdToken({
+        provider: "google",
+        token: userInfo.data.idToken,
+      });
+      if (error) return Promise.reject(error);
+      set({ session: data.session });
+      return Promise.resolve(data.user);
+    } else {
+      return Promise.reject(new Error("no ID token present!"));
+    }
   },
   register: async (email, password) => {
     if (!email) return Promise.reject("Email is required");

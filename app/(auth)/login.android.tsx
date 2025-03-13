@@ -1,14 +1,15 @@
+import { statusCodes } from "@react-native-google-signin/google-signin";
 import { View } from "react-native";
 import { Text } from "~/components/ui/text";
 import { Button } from "~/components/ui/button";
 import Google from "~/assets/images/logos/google.svg";
 import Banner from "~/assets/images/banner.svg";
 import { toast } from "sonner-native";
-import useAuthStore from "~/stores/AuthStore";
+import useAuthStore from "~/stores/AuthStore.android";
 import { AuthError } from "@supabase/supabase-js";
 
 export default function LoginScreen() {
-  const { loginAnonymously } = useAuthStore();
+  const { loginWithGoogle, loginAnonymously } = useAuthStore();
   return (
     <View className="flex-1 items-center justify-center gap-5 bg-[#0FA958] px-3">
       <View className="w-[80%] items-center">
@@ -19,9 +20,29 @@ export default function LoginScreen() {
           variant="outline"
           className="h-28 w-[90%] flex-row items-center justify-center gap-3 rounded-3xl"
           onPress={async () => {
-            toast.info("Long hold to sign-in", {
-              duration: 2500,
-            });
+            try {
+              await loginWithGoogle();
+            } catch (error: any) {
+              if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+                toast.error("Login cancelled", {
+                  duration: 2500,
+                });
+              } else if (error.code === statusCodes.IN_PROGRESS) {
+                toast.error("Operation is already in progress", {
+                  duration: 2500,
+                });
+              } else if (
+                error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE
+              ) {
+                toast.error("Play services not available", {
+                  duration: 2500,
+                });
+              } else {
+                toast.error("Something went wrong", {
+                  duration: 2500,
+                });
+              }
+            }
           }}
           onLongPress={async () => {
             try {
