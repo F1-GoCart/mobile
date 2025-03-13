@@ -19,11 +19,6 @@ export default function LoginScreen() {
           variant="outline"
           className="h-28 w-[90%] flex-row items-center justify-center gap-3 rounded-3xl"
           onPress={async () => {
-            toast.info("Long hold to sign-in", {
-              duration: 2500,
-            });
-          }}
-          onLongPress={async () => {
             try {
               await loginAnonymously();
             } catch (error) {
