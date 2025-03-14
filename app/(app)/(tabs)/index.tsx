@@ -68,18 +68,32 @@ export default function Screen() {
 
   return (
     <SafeAreaView className="flex-1 items-start justify-normal gap-2 bg-secondary/30 p-2 px-4">
-      <Card className="w-full border-0">
-        <CardHeader className="w-full flex-row items-center justify-between pr-24">
-          <Avatar alt="Your Avatar" className="h-14 w-14">
+      <Card className="bg-[ w-full border-0">
+        <CardHeader className="w-full flex-row items-center justify-between pr-32">
+          <Avatar alt="Your Avatar" className="h-20 w-20">
             <AvatarImage source={{ uri: user.avatar_url! }} />
           </Avatar>
           <View>
             <CardTitle>{user.name}</CardTitle>
-            <CardDescription>
+            <CardDescription className="mt-1">
               {user.email ?? `${userId}@gocart.ph`}
             </CardDescription>
           </View>
         </CardHeader>
+      </Card>
+      <View className="mt-3 w-full gap-5">
+        <TouchableOpacity
+          className="h-14 w-full flex-row items-center gap-2 rounded-lg bg-white px-4"
+          onPress={() => router.push("/list")}
+        >
+          <AntDesign name="shoppingcart" size={24} color="#0FA958" />
+          <Text className="font-semibold">Shopping List</Text>
+        </TouchableOpacity>
+        <TouchableOpacity className="h-14 w-full flex-row items-center gap-2 rounded-lg bg-white px-4">
+          <Feather name="settings" size={24} color="#0FA958" />
+          <Text className="font-semibold">Settings</Text>
+        </TouchableOpacity>
+
         <Button
           variant="outline"
           className="shadow shadow-foreground/5"
@@ -89,20 +103,6 @@ export default function Screen() {
         >
           <Text>Sign out</Text>
         </Button>
-      </Card>
-      <View className="h-[0.55] w-[95%] self-center bg-black opacity-50" />
-      <View className="mt-6 w-full gap-2">
-        <TouchableOpacity
-          className="h-14 w-full flex-row items-center gap-2 rounded-lg bg-white px-4 shadow-2xl"
-          onPress={() => router.push("/list")}
-        >
-          <AntDesign name="shoppingcart" size={24} color="#0FA958" />
-          <Text className="font-semibold">Shopping List</Text>
-        </TouchableOpacity>
-        <TouchableOpacity className="h-14 w-full flex-row items-center gap-2 rounded-lg bg-white px-4 shadow-2xl">
-          <Feather name="settings" size={24} color="#0FA958" />
-          <Text className="font-semibold">Settings</Text>
-        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
