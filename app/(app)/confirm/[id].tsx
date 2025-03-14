@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { View, Image, ImageBackground } from "react-native";
+import { View, Image, ImageBackground, TouchableOpacity } from "react-native";
 import { TextClassContext, Text } from "~/components/ui/text";
 import SwipeButton from "rn-swipe-button";
 import Animated, {
@@ -46,15 +46,19 @@ export default function DetailsScreen() {
         source={require("~/assets/images/banner_long.png")}
         className="mx-auto mt-16 w-9/12"
         resizeMode="contain"
+        style={{ marginBottom: 20 }}
       />
       <TextClassContext.Provider value="text-white text-center">
         <View className="items-center justify-center gap-10">
-          <Text className="text-lg font-semibold uppercase">
+          <Text
+            className="text-lg font-semibold uppercase"
+            style={{ fontSize: 18, maxWidth: 250 }}
+          >
             Are you connecting to cart no.
           </Text>
           <ImageBackground
             source={require("~/assets/images/cart.png")}
-            className="h-64 w-64"
+            className="mb-4 h-72 w-72"
             resizeMode="contain"
           >
             <Text
@@ -67,36 +71,28 @@ export default function DetailsScreen() {
               {cartNumber}
             </Text>
           </ImageBackground>
-          <Text className="text-lg font-bold uppercase">
+          <Text
+            className="text-lg font-bold uppercase"
+            style={{ fontSize: 18, maxWidth: 250, marginBottom: 50 }}
+          >
             Please check the number of the cart
           </Text>
           <View className="w-full">
-            <SwipeButton
-              railBackgroundColor="#227e4e"
-              railBorderColor="rgba(255, 255, 255, 0)"
-              railFillBackgroundColor="#3d8e64"
-              railFillBorderColor="rgba(255, 255, 255, 0)"
-              thumbIconBackgroundColor="white"
-              thumbIconBorderColor="rgba(252, 255, 87, 0)"
-              thumbIconComponent={() => <CartIcon width={30} height={30} />}
-              titleComponent={() => (
-                <TripleArrowAnimated
-                  icon="chevron-right"
-                  size={18}
-                  color="#FFFFFF"
-                  delay={100}
-                  waitDuration={2000}
-                  swiped={swiped}
-                />
-              )}
-              height={55}
-              onSwipeSuccess={() => {
+            <TouchableOpacity
+              style={{
+                backgroundColor: "#3d8e64",
+                paddingVertical: 15,
+                borderRadius: 5,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+              onPress={() => {
                 setSwiped(true);
                 startSession();
               }}
-              onSwipeFail={() => setSwiped(false)}
-              onSwipeStart={() => setSwiped(true)}
-            />
+            >
+              <Text> Activate </Text>
+            </TouchableOpacity>
           </View>
         </View>
       </TextClassContext.Provider>
