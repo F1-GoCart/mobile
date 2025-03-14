@@ -23,6 +23,13 @@ export default function AppLayout() {
         }}
       />
       <Stack.Screen
+        name="status/[id]"
+        options={{
+          title: "Cart Status",
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
         name="confirm/[id]"
         options={{
           title: "Confirm",
