@@ -45,12 +45,12 @@ export default function DetailsScreen() {
 
   return (
     <View className="flex-1 bg-[#0fa958] px-5">
-      {/* <Image
+      <Image
         source={require("~/assets/images/banner_long.png")}
         className="mx-auto mt-16 w-9/12"
         resizeMode="contain"
         style={{ marginBottom: 20 }}
-      /> */}
+      />
       <TextClassContext.Provider value="text-white text-center">
         <View className="items-center justify-center gap-8">
           <Text className="text-2xl font-semibold uppercase">Cart No.</Text>
