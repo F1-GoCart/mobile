@@ -119,7 +119,7 @@ export default function Screen() {
       supabase.removeChannel(userChannel);
       supabase.removeChannel(cartChannel);
     };
-  }, []);
+  }, [session.user.id, cart?.cart_id]);
 
   if (status === "pending" || cartStatus === "pending") {
     return <ActivityIndicator />;

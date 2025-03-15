@@ -44,7 +44,7 @@ export default function DetailsScreen() {
     <View className="flex-1 bg-[#0fa958] px-5">
       <Image
         source={require("~/assets/images/banner_long.png")}
-        className="mx-auto mt-16 w-9/12"
+        className="mx-auto mt-4 w-9/12"
         resizeMode="contain"
         style={{ marginBottom: 20 }}
       />
@@ -73,27 +73,26 @@ export default function DetailsScreen() {
           </ImageBackground>
           <Text
             className="text-lg font-bold uppercase"
-            style={{ fontSize: 18, maxWidth: 250, marginBottom: 50 }}
+            style={{ fontSize: 18, maxWidth: 250, marginBottom: 18 }}
           >
             Please check the number of the cart
           </Text>
-          <View className="w-full">
-            <TouchableOpacity
-              style={{
-                backgroundColor: "#3d8e64",
-                paddingVertical: 15,
-                borderRadius: 5,
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-              onPress={() => {
-                setSwiped(true);
-                startSession();
-              }}
-            >
-              <Text> Activate </Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            style={{
+              backgroundColor: "white",
+              paddingVertical: 15,
+              borderRadius: 5,
+              alignItems: "center",
+              justifyContent: "center",
+              width: "100%",
+            }}
+            onPress={() => {
+              setSwiped(true);
+              startSession();
+            }}
+          >
+            <Text className="text-[#0FA958]"> Activate </Text>
+          </TouchableOpacity>
         </View>
       </TextClassContext.Provider>
     </View>

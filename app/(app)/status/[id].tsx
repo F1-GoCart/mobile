@@ -45,12 +45,12 @@ export default function DetailsScreen() {
 
   return (
     <View className="flex-1 bg-[#0fa958] px-5">
-      <Image
+      {/* <Image
         source={require("~/assets/images/banner_long.png")}
         className="mx-auto mt-16 w-9/12"
         resizeMode="contain"
         style={{ marginBottom: 20 }}
-      />
+      /> */}
       <TextClassContext.Provider value="text-white text-center">
         <View className="items-center justify-center gap-8">
           <Text className="text-2xl font-semibold uppercase">Cart No.</Text>
@@ -69,11 +69,11 @@ export default function DetailsScreen() {
               {cartNumber}
             </Text>
           </ImageBackground>
-          <Text className="text-3xl font-bold uppercase">Activated</Text>
+          <Text className="pb-4 text-3xl font-bold uppercase">Activated</Text>
           <View className="w-full">
             <TouchableOpacity
               style={{
-                backgroundColor: "#3d8e64",
+                backgroundColor: "white",
                 paddingVertical: 15,
                 borderRadius: 5,
                 alignItems: "center",
@@ -84,7 +84,7 @@ export default function DetailsScreen() {
                 stopSession();
               }}
             >
-              <Text> Deactivate </Text>
+              <Text className="text-[#0FA958]"> Deactivate </Text>
             </TouchableOpacity>
           </View>
         </View>
